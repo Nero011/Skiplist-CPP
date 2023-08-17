@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <cstring>
 
 using std::cout, std::endl;
 
@@ -39,7 +40,7 @@ Node<K,V>::~Node(){
 template <typename K, typename V>
 class skipList{
 public:
-    skipList();
+    skipList(int maxLevel);
 
     void insret(K key, V val);
     void del(V val);
@@ -51,15 +52,36 @@ private:
     int _curLevel;
     Node<K,V>* _header;
 
+
 };
+
+template<typename K, typename V>
+int skipList<K, V>::getRandom() {
+    srand((unsigned)time(NULL));
+
+    return rand() % _maxLevel + 1;
+}
+
+template<typename K, typename V>
+skipList<K, V>::skipList(int maxLevel) {
+    _maxLevel = maxLevel;
+    _curLevel = 0;
+
+    K k;
+    V v;
+    _header = new Node<K,V>(k,v,_maxLevel);
+}
 
 template<typename K, typename V>
 void skipList<K, V>::insret(K key, V val) {
     Node<K,V>* cur = _header;
+    Node<K,V>* update[this->_maxLevel + 1];
+    memset(update, 0, sizeof(Node<K,V>) * (this->_maxLevel+1));
     for(int level = _curLevel; level >= 0; level--){
         while (cur->forward[level] != nullptr && cur->forward[level]->getKey() < key){
             cur = cur->forward[level];
         }
+        update[level] = cur;
     }
 
     cur = cur->forward[0];
@@ -69,6 +91,24 @@ void skipList<K, V>::insret(K key, V val) {
 
     if(cur != nullptr && cur->getKey() != key){
         int randomLevel = getRandom();
+        //如果增加层数，需要更新update数组
+        if(randomLevel > _curLevel){
+            for(int level = _curLevel + 1; level < randomLevel + 1; level++){
+                update[level] = _header;
+            }
+            _curLevel = randomLevel;
+        }
+
+        //插入新节点
+        Node<K,V>* insertNode = new Node<K,V>(key, val, randomLevel);
+        for(int level = 0; level < _curLevel; level++){
+            insertNode->forward[level] = update[level]->forward[level];
+            update[level]->forward[level] = insertNode;
+        }
+
+        cout << "Successfully insert node!!" << endl;
+
+        return;
     }
 }
 
