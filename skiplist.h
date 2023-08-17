@@ -29,6 +29,9 @@ Node<K,V>::Node(K key, V val, int level) {
     this->_key = key;
     this->_val = val;
     this->_listLevel = level;
+
+    this->forward = new Node<K,V>*[level+1];
+    memset(this->forward, 0, sizeof(Node<K, V>*)*(level+1));
 }
 
 
@@ -67,7 +70,7 @@ skipList<K, V>::skipList(int maxLevel) {
     _maxLevel = maxLevel;
     _curLevel = 0;
 
-    K k;
+    K k = 0;
     V v;
     _header = new Node<K,V>(k,v,_maxLevel);
 }
@@ -89,7 +92,7 @@ void skipList<K, V>::insret(K key, V val) {
         cout << "key is exist!" << endl;
     }
 
-    if(cur != nullptr && cur->getKey() != key){
+    if(cur == nullptr || cur->getKey() != key){
         int randomLevel = getRandom();
         //如果增加层数，需要更新update数组
         if(randomLevel > _curLevel){
