@@ -76,7 +76,7 @@ template<typename K, typename V>
 void skipList<K, V>::insret(K key, V val) {
     Node<K,V>* cur = _header;
     Node<K,V>* update[this->_maxLevel + 1];
-    memset(update, 0, sizeof(Node<K,V>) * (this->_maxLevel+1));
+    memset(update, 0, sizeof(Node<K,V>*) * (this->_maxLevel+1));
     for(int level = _curLevel; level >= 0; level--){
         while (cur->forward[level] != nullptr && cur->forward[level]->getKey() < key){
             cur = cur->forward[level];
