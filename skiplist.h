@@ -2,6 +2,15 @@
 // Created by alu on 23-8-17.
 //
 
+#ifndef __SKIPLIST__
+#define __SKIPLIST__
+
+/*
+ * TODO:
+ * 1.增加文件落盘
+ * 2.增加修改节点操作
+*/
+
 #include <iostream>
 #include <cstring>
 
@@ -46,7 +55,7 @@ public:
     skipList(int maxLevel);
 
     void insret(K key, V val);
-    void del(V val);
+    void del(K key);
     bool search(K key);
     int getRandom();
 
@@ -57,6 +66,46 @@ private:
 
 
 };
+
+template<typename K, typename V>
+void skipList<K, V>::del(K key) {
+    if(!search(key)){
+        cout << "NOT FOUND";
+    }
+
+
+    Node<K,V>* cur = _header;
+    Node<K,V>* update[this->_maxLevel + 1];
+    memset(update, 0, sizeof(Node<K,V>*) * (this->_maxLevel+1));
+    for(int level = _curLevel; level >= 0; level--){
+        while (cur->forward[level] != nullptr && cur->forward[level]->getKey() < key){
+            cur = cur->forward[level];
+        }
+        update[level] = cur;
+    }
+
+    cur = cur->forward[0];
+
+    if(cur != nullptr && cur->getKey() == key){
+
+        for (int i = 0; i < _curLevel; ++i) {
+
+            //update[i]是本层跳入下层前的最后一个节点，如果在本层的下一个节点不是目标节点的话，证明节点已经全部删除
+            if(update[i]->forward[i] != cur){
+                break;
+            }
+
+            update[i]->forward[i] = cur->forward[i];
+        }
+        //删除一层为空的多余的表
+        while (_curLevel > 0 && _header->forward[_curLevel] == nullptr){
+            _curLevel--;
+        }
+        delete cur;
+    }
+    cout << "delete success" << endl;
+    return;
+}
 
 template<typename K, typename V>
 int skipList<K, V>::getRandom() {
@@ -141,3 +190,6 @@ bool skipList<K, V>::search(K key) {
     cout << "NOT FOUND!" << endl;
     return false;
 }
+
+
+#endif

@@ -7,13 +7,24 @@
 
 using namespace std;
 
+
+
 int main(){
-    skipList<int, string> skip(5);
-    skip.insret(1, "oasndg");
-    skip.insret(10, "这里是10");
-    skip.insret(18, "18");
-    skip.insret(2, "zheli2");
-    skip.insret(6, "6");
+    skipList<char, string> skip(5);
+    skip.insret('a', "oasndg");
+    skip.insret('b', "这里是10");
+    skip.insret('v', "18");
+    skip.insret('i', "zheli2");
+    skip.insret('d', "6");
+
+
+    skip.search('a');
+    skip.search('d');
+
+    skip.del('a');
+
+    skip.search('a');
+
 
     return 0;
 }
